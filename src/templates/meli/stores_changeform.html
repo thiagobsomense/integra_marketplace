@@ -1,0 +1,12 @@
+{% extends 'admin/change_form.html' %}
+
+{% block object-tools %}
+    <div>
+        <form action="autorizar/" method="POST">
+            {% csrf_token %}
+                <button type="submit">Autorizar APP</button>
+        </form>
+    </div>
+    <br />
+    {{ block.super }}
+{% endblock %}
