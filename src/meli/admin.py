@@ -35,6 +35,7 @@ class RegisterStoreAdmin(admin.ModelAdmin):
     
     def get_form(self, request, obj, **kwargs):
         form = super().get_form(request, obj, **kwargs)
+        self.code = request.GET.get('code')
         return form
     
     def save_model(self, request, obj, form, change):
@@ -56,6 +57,7 @@ class RegisterStoreAdmin(admin.ModelAdmin):
         return super().save_model(request, obj, form, change)
     
     def set_auth_url(self, request):
+        print('teste')
         config = Config.objects.filter(user=request.user).first()
         client_id = config.client_id
         client_secret = config.secret_id
