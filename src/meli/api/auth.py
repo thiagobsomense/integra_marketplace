@@ -4,6 +4,7 @@ from urllib.parse import urlencode
 
 class Client(object):
     api_url = 'https://api.mercadolibre.com'
+    logout_url = 'https://www.mercadolibre.com/jms/mlb/lgz/logout?go='
 
     auth_urls = {
         'MLA': "https://auth.mercadolibre.com.ar",  # Argentina
@@ -38,11 +39,11 @@ class Client(object):
 
     def authorization_url(self, redirect_url):
         params = {
-            'client_id': self.client_id,
             'response_type': 'code',
+            'client_id': self.client_id,
             'redirect_uri': redirect_url
         }
-        url = f'{self.auth_url}/authorization?response_type=code&{urlencode(params)}'
+        url = f'{self.auth_url}/authorization?{urlencode(params)}'
         return url
 
     def exchange_code(self, redirect_url, code):
