@@ -38,8 +38,15 @@ class RegisterStoreAdmin(admin.ModelAdmin):
         return form
     
     def save_model(self, request, obj, form, change):
-        token = self.client.exchange_code(self.redirect_url, self.code)
-        self.client.set_token(token)
+        config = Config.objects.filter(user=request.user).first()
+        client_id = config.client_id
+        client_secret = config.secret_id
+        redirect_url = config.redirect_url
+        site = config.location
+
+        client = Client(client_id, client_secret, site)
+        token = client.exchange_code(redirect_url, self.code)
+        client.set_token(token)
             
         obj.access_token = token['access_token']
         obj.refresh_token = token['refresh_token']
