@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.http import HttpResponseRedirect
 from django.urls import path
+from django.contrib import messages
 from .models import Config, Store, Order
 from .api.auth import Client
 
@@ -38,35 +39,36 @@ class RegisterStoreAdmin(admin.ModelAdmin):
         return form
     
     def save_model(self, request, obj, form, change):
-        config = Config.objects.filter(user=request.user).first()
-        client_id = config.client_id
-        client_secret = config.secret_id
-        redirect_url = config.redirect_url
-        site = config.location
-
-        client = Client(client_id, client_secret, site)
-        token = client.exchange_code(redirect_url, self.code)
-        client.set_token(token)
+        if not change:
+            token = self.client.exchange_code(self.redirect_url, self.code)
+            store = Store.objects.filter(client_id=token['user_id'])
             
-        obj.access_token = token['access_token']
-        obj.refresh_token = token['refresh_token']
-        obj.client_id = token['user_id']
+            if store.count() > 0:
+                messages.set_level(request, messages.WARNING)
+                messages.add_message(request, messages.WARNING, f'A loja {token["user_id"]} já está cadastrada no sistema!')
+                return
+            else:
+                self.client.set_token(token)
+                new_token = self.client.refresh_token()
+                obj.access_token = new_token['access_token']
+                obj.refresh_token = new_token['refresh_token']
+                obj.client_id = new_token['user_id']
+                
         obj.user = request.user
+        
         return super().save_model(request, obj, form, change)
     
     def auth_url(self, request):
         config = Config.objects.filter(user=request.user).first()
         client_id = config.client_id
         client_secret = config.secret_id
-        redirect_url = config.redirect_url
         site = config.location
+        self.redirect_url = config.redirect_url
 
-        client = Client(client_id, client_secret, site)
-        url = client.authorization_url(redirect_url)
+        self.client = Client(client_id, client_secret, site)
+        url = self.client.authorization_url(self.redirect_url)
         self.message_user(request, 'Seu código de autorização foi gerado com sucesso!')
         return HttpResponseRedirect(url)
-    
-        # new_token = client.refresh_token()
 
 
 @admin.register(Order)
