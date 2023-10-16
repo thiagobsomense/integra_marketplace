@@ -17,7 +17,7 @@ class Orders():
             'order.date_created.to': date_end,
             'order.status': 'paid'
         }
-        url = self.api_orders
+        url = f'{self.api_orders}?{urlencode(params)}'
 
         response = requests.request('GET', url, headers=self.headers, data=urlencode(params))
         return response.json()
@@ -33,7 +33,7 @@ class Orders():
         params = {}
         url = f'{self.api_orders}/recent?seller={self.client_id}'
 
-        response = requests.request('GET', url, headers=self.headers, data=params)
+        response = requests.request('GET', url, headers=self.headers, data=urlencode(params))
         return response.json()
     
     def products():
