@@ -1,24 +1,20 @@
 from django.shortcuts import render
-
-
-
-class Store():
-    def add_store(request):
-        CLIENT_ID = '5567700473549133'
-        CLIENT_SECRET = 'NFlAtiFUEsf9KauUSxJiRPHXs1hojZBX'
-        SITE = 'MLB'
-        REDIRECT_URL = 'http://localhost:8000/mercadolivre/'
-        CODE = request.GET.get('code')
-        
-        
-        ACCESS_TOKEN = request.GET.get('access_token')
-        REFRESH_TOKEN = token['refresh_token']
-        USER_ID = token['user_id']
-        
-        print(new_token)
-
-        return render(request, 'meli/auth.html', {'url': url})
+from .api.sales import Orders
+from .models import Store, Order, OrderItem, Payment
 
 
 def orders(request):
+    store = Store.objects.all().last()
+    client_id = '627529294'
+    token = 'APP_USR-5567700473549133-101318-b249ab38a4d1e05e9ff08ec2f2adfeea-627529294'
+    order = Orders(client_id, token)
+    pedidos = order.archived_orders()
+    total = pedidos['paging']['total']
+
+    for pedido in pedidos['results']:
+        print(pedido['seller'])
+        for items in pedido['order_items']:
+            item = OrderItem(items)
+            print(item)
+    print()
     return render(request, 'meli/orders.html')

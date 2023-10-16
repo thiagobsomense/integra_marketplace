@@ -15,7 +15,7 @@ class Orders():
             'seller': self.client_id,
             'order.date_created.from': date_start,
             'order.date_created.to': date_end,
-            'order.status': 'paid',
+            'order.status': 'paid'
         }
         url = self.api_orders
 
@@ -23,22 +23,17 @@ class Orders():
         return response.json()
 
     def archived_orders(self):
-        params = {
-            'seller': self.client_id,
-        }
-        url = f'{self.api_orders}/archived'
+        params = {}
+        url = f'{self.api_orders}/archived?seller={self.client_id}'
 
         response = requests.request('GET', url, headers=self.headers, data=urlencode(params))
         return response.json()
 
     def recents_orders(self):
-        params = {
-            'seller': self.client_id,
-            'order.status': 'paid',
-        }
-        url = f'{self.api_orders}/recent'
+        params = {}
+        url = f'{self.api_orders}/recent?seller={self.client_id}'
 
-        response = requests.request('GET', url, headers=self.headers, data=urlencode(params))
+        response = requests.request('GET', url, headers=self.headers, data=params)
         return response.json()
     
     def products():
