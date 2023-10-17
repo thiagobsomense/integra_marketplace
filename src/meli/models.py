@@ -19,7 +19,7 @@ class Config(models.Model):
         ('MRD', 'Republica Dominicana')
     )
 
-    user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE)
+    user = models.OneToOneField(get_user_model(), unique=False, on_delete=models.CASCADE)
     client_id = models.CharField(max_length=254)
     secret_id = models.CharField(max_length=254)
     redirect_url = models.CharField(max_length=254)
